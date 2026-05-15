@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kurznews – Was lauft?</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Faro', 'Faro Fallback', sans-serif;
+            background: #ffffff;
+            color: rgba(0, 0, 0, 0.87);
+            padding: 24px 20px;
+            -webkit-font-smoothing: antialiased;
+            text-size-adjust: 100%;
+            hyphens: auto;
+            word-break: break-word;
+        }
+
+        .label {
+            font-family: 'Faro', 'Faro Fallback', sans-serif;
+            font-size: 10px;
+            font-weight: 800;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: #c0392b;
+            margin-bottom: 6px;
+        }
+
+        .date {
+            font-family: 'Faro', 'Faro Fallback', sans-serif;
+            font-size: 12px;
+            font-weight: 600;
+            color: rgba(0, 0, 0, 0.45);
+            margin-bottom: 18px;
+            padding-bottom: 14px;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        .content {
+            font-family: 'Faro', 'Faro Fallback', sans-serif;
+            font-weight: 400;
+            font-size: 1em;
+            line-height: 1.7;
+            color: rgba(0, 0, 0, 0.87);
+            text-wrap: pretty;
+            overflow-wrap: break-word;
+        }
+
+        .content h2, .content h3 {
+            font-weight: 800;
+            line-height: 1.15;
+            font-size: 1.625rem;
+            margin-bottom: 0.35em;
+            margin-top: 1.2em;
+        }
+
+        .content h2:first-child, .content h3:first-child {
+            margin-top: 0;
+        }
+
+        .content p {
+            margin-bottom: 0.75em;
+        }
+
+        .content a {
+            color: #c0392b;
+            text-decoration: none;
+        }
+
+        .content a:hover {
+            text-decoration: underline;
+        }
+
+        .loading {
+            font-size: 13px;
+            color: rgba(0, 0, 0, 0.35);
+        }
+
+        .error {
+            font-size: 13px;
+            color: #c0392b;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="label">Was lauft?</div>
+    <div class="date" id="date"><span class="loading">Wird geladen…</span></div>
+    <div class="content" id="content"></div>
+
+    <script>
+        // ── KONFIGURATION ──────────────────────────────────────────────
+        const JSONBIN_BIN_ID  = '6a06ba06c0954111d82762fd';
+        const JSONBIN_API_KEY = '';
+        // ──────────────────────────────────────────────────────────────
+
+        const url = `https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}/latest`;
+
+        const headers = {};
+        if (JSONBIN_API_KEY && JSONBIN_API_KEY !== 'DEIN_ACCESS_KEY') {
+            headers['X-Access-Key'] = JSONBIN_API_KEY;
+        }
+
+        fetch(url, { headers })
+            .then(function(r) {
+                if (!r.ok) throw new Error('HTTP ' + r.status);
+                return r.json();
+            })
+            .then(function(data) {
+                const rec = data.record || {};
+                document.getElementById('date').textContent   = rec.date   || '';
+                document.getElementById('content').innerHTML  = rec.content || '';
+            })
+            .catch(function(err) {
+                document.getElementById('title').innerHTML   = '<span class="error">Fehler beim Laden</span>';
+                document.getElementById('content').innerHTML = '<span class="error">' + err.message + '</span>';
+            });
+    </script>
+
+</body>
+</html>
