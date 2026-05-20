@@ -48,24 +48,31 @@
             font-size: 1em;
             line-height: 1.7;
             color: rgba(0, 0, 0, 0.87);
-            text-wrap: pretty;
             overflow-wrap: break-word;
         }
 
-        .content h2, .content h3 {
+        .content h2 {
             font-weight: 800;
             line-height: 1.15;
-            font-size: 1.625rem;
-            margin-bottom: 0.35em;
-            margin-top: 1.2em;
+            font-size: 1.1em;
+            margin-top: 1.4em;
+            margin-bottom: 0.3em;
         }
 
-        .content h2:first-child, .content h3:first-child {
+        .content h2:first-child {
             margin-top: 0;
         }
 
         .content p {
-            margin-bottom: 0.75em;
+            margin-bottom: 0.6em;
+        }
+
+        .content img {
+            max-width: 120px;
+            height: auto;
+            display: block;
+            margin-bottom: 0.5em;
+            border-radius: 4px;
         }
 
         .content a {
@@ -114,8 +121,21 @@
             })
             .then(function(data) {
                 const rec = data.record || {};
-                document.getElementById('date').textContent   = rec.date   || '';
-                document.getElementById('content').innerHTML  = rec.content || '';
+                document.getElementById('date').textContent = rec.date || '';
+
+                // ##Titel## in <h2> umwandeln, Rest als <p>
+                var raw = (rec.content || '').trim();
+                var blocks = raw.split('\n\n');
+                var html = blocks.map(function(block) {
+                    block = block.trim();
+                    if (!block) return '';
+                    if (block.indexOf('##') === 0) {
+                        var title = block.replace(/##([^#]*)##/, '$1').trim();
+                        return '<h2>' + title + '</h2>';
+                    }
+                    return '<p>' + block.replace(/\n/g, '<br>') + '</p>';
+                }).join('');
+                document.getElementById('content').innerHTML = html;
             })
             .catch(function(err) {
                 document.getElementById('title').innerHTML   = '<span class="error">Fehler beim Laden</span>';
