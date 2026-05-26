@@ -109,19 +109,9 @@
     <div class="content" id="content"></div>
 
     <script>
-        // ── KONFIGURATION ──────────────────────────────────────────────
-        const JSONBIN_BIN_ID  = '6a0da8796610dd3ae876f3b0';
-        const JSONBIN_API_KEY = '';
-        // ──────────────────────────────────────────────────────────────
+        const url = 'https://raw.githubusercontent.com/moelany/webKurznews/main/data.json';
 
-        const url = `https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}/latest`;
-
-        const headers = {};
-        if (JSONBIN_API_KEY && JSONBIN_API_KEY !== 'DEIN_ACCESS_KEY') {
-            headers['X-Access-Key'] = JSONBIN_API_KEY;
-        }
-
-        fetch(url, { headers })
+        fetch(url)
             .then(function(r) {
                 if (!r.ok) throw new Error('HTTP ' + r.status);
                 return r.json();
