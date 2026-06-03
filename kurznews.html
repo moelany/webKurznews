@@ -117,7 +117,7 @@
                 return r.json();
             })
             .then(function(data) {
-                const rec = data.record || {};
+                const rec = data || {};
                 document.getElementById('date').textContent = rec.date || '';
 
                 // ##Titel## in <h2> umwandeln, Rest als <p>
