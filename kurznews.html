@@ -100,16 +100,43 @@
             font-size: 13px;
             color: #c0392b;
         }
+
+        .edition {
+            margin-bottom: 32px;
+        }
+
+        .edition + .edition {
+            border-top: 1px solid rgba(0, 0, 0, 0.1);
+            padding-top: 28px;
+        }
+
+        .edition .date {
+            margin-bottom: 12px;
+            padding-bottom: 0;
+            border-bottom: none;
+        }
     </style>
 </head>
 <body>
 
     <div class="label">Was lauft?</div>
-    <div class="date" id="date"><span class="loading">Wird geladen…</span></div>
-    <div class="content" id="content"></div>
+    <div id="editions"><span class="loading">Wird geladen…</span></div>
 
     <script>
         const url = 'https://raw.githubusercontent.com/moelany/webKurznews/main/data.json';
+
+        function renderContent(raw) {
+            var blocks = (raw || '').trim().split('\n\n');
+            return blocks.map(function(block) {
+                block = block.trim();
+                if (!block) return '';
+                if (block.indexOf('##') === 0) {
+                    var title = block.replace(/##([^#]*)##/, '$1').trim();
+                    return '<h2>' + title + '</h2>';
+                }
+                return '<p>' + block.replace(/\n/g, '<br>') + '</p>';
+            }).join('');
+        }
 
         fetch(url)
             .then(function(r) {
@@ -117,26 +144,18 @@
                 return r.json();
             })
             .then(function(data) {
-                const rec = data || {};
-                document.getElementById('date').textContent = rec.date || '';
-
-                // ##Titel## in <h2> umwandeln, Rest als <p>
-                var raw = (rec.content || '').trim();
-                var blocks = raw.split('\n\n');
-                var html = blocks.map(function(block) {
-                    block = block.trim();
-                    if (!block) return '';
-                    if (block.indexOf('##') === 0) {
-                        var title = block.replace(/##([^#]*)##/, '$1').trim();
-                        return '<h2>' + title + '</h2>';
-                    }
-                    return '<p>' + block.replace(/\n/g, '<br>') + '</p>';
+                // Unterstützt sowohl altes Format {date,content} als auch neues [{date,content},...]
+                var entries = Array.isArray(data) ? data : [data];
+                var html = entries.map(function(rec) {
+                    return '<div class="edition">'
+                        + '<div class="date">' + (rec.date || '') + '</div>'
+                        + '<div class="content">' + renderContent(rec.content) + '</div>'
+                        + '</div>';
                 }).join('');
-                document.getElementById('content').innerHTML = html;
+                document.getElementById('editions').innerHTML = html;
             })
             .catch(function(err) {
-                document.getElementById('title').innerHTML   = '<span class="error">Fehler beim Laden</span>';
-                document.getElementById('content').innerHTML = '<span class="error">' + err.message + '</span>';
+                document.getElementById('editions').innerHTML = '<span class="error">' + err.message + '</span>';
             });
     </script>
 
